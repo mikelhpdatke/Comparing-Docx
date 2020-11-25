@@ -5,6 +5,7 @@
 data
 dist
 files
+uploads
 # User-specific stuff:
 .idea/**/workspace.xml
 .idea/**/tasks.xml

@@ -1,6 +1,8 @@
 import {
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Post,
   UploadedFile,
   UploadedFiles,
@@ -12,9 +14,12 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { extname } from 'path';
 import { AppService } from './app.service';
 import { ApiMultiFilesAndFile, ApiFile } from './decorators/ApiMultiFiles';
 import { compareDocxListVsDocx } from './utils/compare-docx/comparepdf.js';
+import { diskStorage } from 'multer';
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -25,12 +30,31 @@ export class AppController {
   }
 
   @Post('upload')
-  @ApiMultiFilesAndFile()
   @ApiConsumes('multipart/form-data')
   // @UseInterceptors(FilesInterceptor('files'), FileInterceptor('actualFile'))
   // @UseInterceptors()
-  @UseInterceptors(AnyFilesInterceptor())
-  uploadFile(@UploadedFiles() files) {
+  @ApiMultiFilesAndFile()
+  @UseInterceptors(
+    AnyFilesInterceptor({
+      storage: diskStorage({
+        destination: './uploads',
+        fileSize: 5e7,
+        files: 20,
+        filename: (req, file, cb) => {
+          try {
+            // const fileName = '123456789';
+            // console.log('file :>> ', file);
+            return cb(null, `${file.originalname}`);
+          } catch (err) {
+            return cb(
+              new HttpException('Errored at upload', HttpStatus.BAD_REQUEST),
+            );
+          }
+        },
+      }),
+    }),
+  )
+  async uploadFile(@UploadedFiles() files) {
     // console.log(files);
     const thiSinhFiles = files
       .filter((fileObj) => fileObj.fieldname === 'files')
@@ -38,7 +62,8 @@ export class AppController {
     const ketQuaFile = files
       .filter((fileObj) => fileObj.fieldname !== 'files')
       .map((element) => element.path);
-    console.log('thiSinhFiles, ketQuaFile :>> ', thiSinhFiles, ketQuaFile);
-    compareDocxListVsDocx(thiSinhFiles, ketQuaFile);
+    // console.log('thiSinhFiles, ketQuaFile :>> ', thiSinhFiles, ketQuaFile);
+
+    return await compareDocxListVsDocx(thiSinhFiles, ketQuaFile);
   }
 }

@@ -11,7 +11,8 @@
     "outDir": "./dist",
     "allowJs": true,
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "resolveJsonModule": true
   },
   "include": ["src"],
   "exclude": [
