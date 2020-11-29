@@ -63,7 +63,7 @@ export class AppController {
       .filter((fileObj) => fileObj.fieldname !== 'files')
       .map((element) => element.path);
     // console.log('thiSinhFiles, ketQuaFile :>> ', thiSinhFiles, ketQuaFile);
-
+    // return { status: 'ok' };
     return await compareDocxListVsDocx(thiSinhFiles, ketQuaFile);
   }
 }

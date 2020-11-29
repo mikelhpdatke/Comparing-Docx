@@ -64,7 +64,7 @@ const compareTwoPdf = async (absPathFile1, absPathFile2) => {
 
 const compareDocxListVsDocx = async (arrXTest, YTest) => {
   let listOfConvertedPdfPath = [];
-
+  console.log('arrXTest, YTest :>> ', arrXTest, YTest);
   const listofPromises = arrXTest.map(async (element, index) => {
     return convertDoc2Pdf(
       element,
@@ -93,8 +93,12 @@ const compareDocxListVsDocx = async (arrXTest, YTest) => {
       0,
       realNameContestant.indexOf('.'),
     );
+
+    const floatResult = await compareTwoPdf(element, YTestConverted);
+    const finalResult = `${(floatResult * 10).toFixed(2)}/10`;
     result.push({
-      [realNameContestant]: await compareTwoPdf(element, YTestConverted),
+      tenThiSinh: realNameContestant,
+      ketQua: finalResult,
     });
     // console.log('result :>> ', result);
   }
@@ -102,6 +106,7 @@ const compareDocxListVsDocx = async (arrXTest, YTest) => {
   //   const result = await compareTwoPdf(element, YTestConverted);
   //   console.log('result :>> ', result);
   // });
+  console.log('result :>> ', result);
   return result;
 };
 
